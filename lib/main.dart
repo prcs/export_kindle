@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_html_to_pdf/flutter_html_to_pdf.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
+
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -50,6 +51,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   static const platform = const MethodChannel('app.channel.shared.data');
+  static const androidMethodChannel = const MethodChannel('team.native.io/screenshot');
   String dataShared = "No data";
   String generatedPdfFilePath;
 
@@ -111,11 +113,16 @@ class _MyHomePageState extends State<MyHomePage> {
         htmlContent, targetPath, targetFileName);
     dataShared = generatedPdfFile.path;
 
+    await send(dataShared);
+
+  }
+
+  Future<void> send(String path) async {
     final Email email = Email(
-      body: 'Email body',
-      subject: 'Email subject',
-      recipients: ['peterson_@live.com'],
-      attachmentPath: dataShared,
+      body: "Mail body",
+      subject: "Subject",
+      recipients: ["peterson_@live.com"],
+      attachmentPath: path,
     );
 
     try {
@@ -127,9 +134,38 @@ class _MyHomePageState extends State<MyHomePage> {
 
   }
 
+  void addNumbers() {
+
+    generateExampleDocument();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: Center(child: Text(dataShared)));
+    return new Scaffold(
+        appBar: new AppBar(
+          title: new Text("Raised Button"),
+        ),
+        body: new Center(
+          child: new Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+
+              new Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  new RaisedButton(
+                    padding: const EdgeInsets.all(8.0),
+                    textColor: Colors.white,
+                    color: Colors.blue,
+                    onPressed: addNumbers,
+                    child: new Text("Add"),
+                  ),
+                  Text(dataShared)
+                ],
+              )
+            ],
+          ),
+        ));
   }
 
   getSharedText() async {
@@ -142,4 +178,6 @@ class _MyHomePageState extends State<MyHomePage> {
       //generateExampleDocument();
     }
   }
+
+
 }
